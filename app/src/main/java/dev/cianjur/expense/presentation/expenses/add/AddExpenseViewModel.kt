@@ -1,5 +1,6 @@
 package dev.cianjur.expense.presentation.expenses.add
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.cianjur.expense.domain.model.Category
@@ -27,8 +28,6 @@ class AddExpenseViewModel(
     private val categoryRepository: CategoryRepository,
 ) : ViewModel() {
 
-    private val _title = MutableStateFlow("")
-    private val _amount = MutableStateFlow("")
     private val _date = MutableStateFlow(Clock.System.todayIn(TimeZone.currentSystemDefault()))
     private val _selectedCategoryId = MutableStateFlow<String?>(null)
     private val _notes = MutableStateFlow("")
@@ -40,31 +39,19 @@ class AddExpenseViewModel(
     val categories = categoryRepository.getCategories()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val uiState: StateFlow<AddExpenseUiState> = MutableStateFlow(
-        AddExpenseUiState(
-            title = _title.value,
-            amount = _amount.value,
-            date = _date.value,
-            selectedCategoryId = _selectedCategoryId.value,
-            notes = _notes.value,
-            images = _images.value,
-            isLoading = _isLoading.value,
-            error = _error.value
-        )
-    ).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = AddExpenseUiState()
+    val uiState = MutableStateFlow(
+        AddExpenseUiState()
     )
 
     val expenseSaved: SharedFlow<String> = _expenseSaved.asSharedFlow()
 
     fun setTitle(title: String) {
-        _title.value = title
+        Log.d("AGUSSS", "title $title")
+        uiState.value = uiState.value.copy(title = title)
     }
 
     fun setAmount(amount: String) {
-        _amount.value = amount
+        uiState.value = uiState.value.copy(amount = amount)
     }
 
     fun setDate(date: LocalDate) {
@@ -116,10 +103,10 @@ class AddExpenseViewModel(
 
             _isLoading.value = true
             try {
-                val amountValue = _amount.value.toDoubleOrNull() ?: 0.0
+                val amountValue = uiState.value.amount.toDoubleOrNull() ?: 0.0
 
                 val expense = Expense(
-                    title = _title.value,
+                    title = uiState.value.title,
                     amount = amountValue,
                     date = _date.value,
                     categoryId = _selectedCategoryId.value ?: "",
@@ -159,12 +146,12 @@ class AddExpenseViewModel(
 
     private fun validateInput(): Boolean {
         return when {
-            _title.value.isBlank() -> {
+            uiState.value.title.isBlank() -> {
                 _error.value = "Title cannot be empty"
                 false
             }
 
-            _amount.value.isBlank() || _amount.value.toDoubleOrNull() == null -> {
+            uiState.value.amount.isBlank() || uiState.value.amount.toDoubleOrNull() == null -> {
                 _error.value = "Amount must be a valid number"
                 false
             }
@@ -179,8 +166,7 @@ class AddExpenseViewModel(
     }
 
     private fun resetForm() {
-        _title.value = ""
-        _amount.value = ""
+        uiState.value = uiState.value.copy(title = "", amount = "")
         _date.value = Clock.System.todayIn(TimeZone.currentSystemDefault())
         _selectedCategoryId.value = null
         _notes.value = ""

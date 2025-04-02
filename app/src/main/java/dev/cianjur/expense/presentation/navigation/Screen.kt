@@ -1,6 +1,8 @@
 package dev.cianjur.expense.presentation.navigation
 
 sealed class Screen(val route: String) {
+    data object SignIn : Screen("sign_in")
+    data object SignUp : Screen("sign_up")
     data object Dashboard : Screen("dashboard")
     data object ExpenseList : Screen("expense_list")
     data object AddExpense : Screen("add_expense")

@@ -11,7 +11,8 @@ data class CategoryDto(
     val color: String,
     val is_default: Boolean,
     val created_at: String,
-    val updated_at: String
+    val updated_at: String,
+    val user_id: String? = null,
 )
 
 fun CategoryDto.toDomain(): Category {

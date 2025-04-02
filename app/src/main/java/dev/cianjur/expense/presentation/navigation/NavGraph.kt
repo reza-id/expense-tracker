@@ -8,6 +8,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import dev.cianjur.expense.presentation.authentication.signin.SignInScreen
+import dev.cianjur.expense.presentation.authentication.signup.SignUpScreen
 import dev.cianjur.expense.presentation.categories.CategoryScreen
 import dev.cianjur.expense.presentation.dashboard.DashboardScreen
 import dev.cianjur.expense.presentation.expenses.add.AddExpenseScreen
@@ -21,9 +23,15 @@ fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.route,
+        startDestination = Screen.SignIn.route,
         modifier = modifier
     ) {
+        composable(route = Screen.SignIn.route) {
+            SignInScreen(navController)
+        }
+        composable(route = Screen.SignUp.route) {
+            SignUpScreen(navController)
+        }
         dashboardScreen(navController)
         expenseListScreen(navController)
         addExpenseScreen(navController)

@@ -1,5 +1,6 @@
 package dev.cianjur.expense.presentation.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.cianjur.expense.domain.model.Category

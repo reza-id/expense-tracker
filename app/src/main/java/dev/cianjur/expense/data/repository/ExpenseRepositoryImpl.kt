@@ -1,5 +1,6 @@
 package dev.cianjur.expense.data.repository
 
+import android.util.Log
 import dev.cianjur.expense.data.local.dao.ExpenseDao
 import dev.cianjur.expense.data.local.dao.ExpenseImageDao
 import dev.cianjur.expense.data.local.entity.toEntity
@@ -84,6 +85,7 @@ class ExpenseRepositoryImpl(
                     expenseDao.markExpenseAsSynced(expense.id)
                 } catch (e: Exception) {
                     // Log error and continue with next expense
+                    Log.e("AGUSSS", "Error syncing data", e)
                     e.printStackTrace()
                 }
             }

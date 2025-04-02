@@ -4,6 +4,8 @@ import dev.cianjur.expense.data.remote.dto.CategoryDto
 import dev.cianjur.expense.data.remote.dto.ExpenseDto
 import dev.cianjur.expense.data.remote.dto.ExpenseImageDto
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
@@ -20,14 +22,23 @@ class SupabaseService(
         supabaseKey = supabaseKey,
     ) {
         install(Postgrest)
-        install(Auth)
+        install(Auth){
+            flowType = FlowType.PKCE
+            scheme = "app"
+            host = "supabase.com"
+        }
         install(Storage)
     }
 
     // Expense operations
     suspend fun getExpenses(): List<ExpenseDto> {
-        return client.postgrest.from("expenses")
-            .select()
+        val userId = client.auth.currentUserOrNull()?.id
+        return if (userId == null) emptyList() else client.postgrest.from("expenses")
+            .select{
+                filter {
+                    eq("user_id", userId)
+                }
+            }
             .decodeList()
     }
 
@@ -43,8 +54,9 @@ class SupabaseService(
     }
 
     suspend fun createExpense(expense: ExpenseDto): ExpenseDto {
+        val userId = client.auth.currentUserOrNull()?.id
         return client.postgrest.from("expenses")
-            .insert(expense)
+            .insert(expense.copy(user_id = userId))
             .decodeSingle()
     }
 
@@ -86,8 +98,9 @@ class SupabaseService(
     }
 
     suspend fun createCategory(category: CategoryDto): CategoryDto {
+        val userId = client.auth.currentUserOrNull()?.id
         return client.postgrest.from("categories")
-            .insert(category)
+            .insert(category.copy(user_id = userId))
             .decodeSingle()
     }
 
@@ -171,5 +184,9 @@ class SupabaseService(
                     eq("id", id)
                 }
             }
+    }
+
+    fun createAuthService(): Auth {
+        return client.auth
     }
 }

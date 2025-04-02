@@ -1,5 +1,7 @@
 package dev.cianjur.expense.di
 
+import dev.cianjur.expense.presentation.authentication.signin.SignInViewModel
+import dev.cianjur.expense.presentation.authentication.signup.SignUpViewModel
 import dev.cianjur.expense.presentation.expenses.list.ExpenseListViewModel
 import dev.cianjur.expense.presentation.expenses.add.AddExpenseViewModel
 import dev.cianjur.expense.presentation.expenses.detail.ExpenseDetailViewModel
@@ -9,6 +11,8 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
+    viewModelOf(::SignInViewModel)
+    viewModelOf(::SignUpViewModel)
     viewModelOf(::ExpenseListViewModel)
     viewModelOf(::AddExpenseViewModel)
     viewModelOf(::ExpenseDetailViewModel)
